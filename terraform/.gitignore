@@ -1,0 +1,4 @@
+# Project ignores
+gcp-terraform-creds.json
+.terraform*
+terraform*
