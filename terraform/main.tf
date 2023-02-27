@@ -53,8 +53,8 @@ resource "google_compute_instance" "mongo_vm" {
   }
 
   metadata = {
-    ssh-keys = <<EOF
-      SHA256:DKdPgDCu5fP1GRPazwJey/dFngKm+ji1i3EJc0nd31c dark0ne@dark0ne
-    EOF
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+    EOT
   }
 }
