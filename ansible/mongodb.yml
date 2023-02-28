@@ -1,0 +1,21 @@
+- hosts: mongodb-shards
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongod, mongod_port: 16969, sharding: true, bind_ip: "{{ private_ip }}"}
+    - { role: community.mongodb.mongodb_mongos, mongos_port: 16970, bind_ip: "{{ private_ip }}", config_servers: "{{ hostvars[mongodb-cfgSrv].private_ip }}:16970"}
+
+- hosts: mongodb-cfgSrv:wa
+
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongod, mongod_port: 16970, bind_ip: "{{ private_ip }}", repl_set_name: cfg}

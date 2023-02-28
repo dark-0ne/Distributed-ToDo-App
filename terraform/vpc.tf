@@ -12,6 +12,18 @@ resource "google_compute_subnetwork" "default" {
 }
 
 # Setup firewall rules
+resource "google_compute_firewall" "allow-internal" {
+  name = "allow-internal"
+  allow {
+    protocol = "all"
+  }
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["10.0.1.0/24"]
+  target_tags   = []
+}
+
 resource "google_compute_firewall" "ssh" {
   name = "allow-ssh"
   allow {
@@ -25,7 +37,7 @@ resource "google_compute_firewall" "ssh" {
   target_tags   = ["ssh"]
 }
 
-resource "google_compute_firewall" "mongo" {
+resource "google_compute_firewall" "mongodb" {
   name = "allow-mongodb"
   allow {
     ports    = ["16969"]
@@ -35,5 +47,5 @@ resource "google_compute_firewall" "mongo" {
   network       = google_compute_network.vpc_network.id
   priority      = 1000
   source_ranges = ["130.231.0.0/16"]
-  target_tags   = ["mongo"]
+  target_tags   = ["mongodb"]
 }
