@@ -31,36 +31,9 @@ resource "google_storage_bucket" "default" {
 }
 
 # Setup VMs
-resource "google_compute_instance" "mongodb_shards" {
-  name         = "mongodb-shard${count.index}"
+resource "google_compute_instance" "mongodb" {
+  name         = "mongodb-${count.index}"
   count        = 3
-  machine_type = "e2-medium"
-  tags         = ["ssh", "mongodb"]
-
-  boot_disk {
-    initialize_params {
-      image = "debian-cloud/debian-11"
-      size  = 25
-    }
-  }
-
-  network_interface {
-    subnetwork = google_compute_subnetwork.default.id
-
-    access_config {
-      # Include this section to give the VM an external IP address
-    }
-  }
-
-  metadata = {
-    "ssh-keys" = <<EOT
-      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
-    EOT
-  }
-}
-
-resource "google_compute_instance" "mongodb_cfgSrv" {
-  name         = "mongodb-cfgSrv"
   machine_type = "e2-medium"
   tags         = ["ssh", "mongodb"]
 
