@@ -19,13 +19,26 @@
         dest: "/home/dark0ne"
         use_ssh_args: true
       run_once: true
-    - name: Run custom mongosh script
-      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_mongodb.js
+
+    - name: Run script to set up replicaset
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_replicaset.js
+      run_once: true
+
+    - name: Wait for replicaset to come online
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+      become: false
+
+    - name: Run script to set up users
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_users.js
       environment:
         MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
       run_once: true
 
+
 - hosts: mongodb
+  become: true
   roles:
     - { role: community.mongodb.mongodb_mongod, mongod_port: 16969, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false }
 

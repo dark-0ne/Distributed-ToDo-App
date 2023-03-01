@@ -1,4 +1,5 @@
 conn = new Mongo("localhost:16969");
+
 rs.initiate({
   _id: "rs0",
   members: [
@@ -6,11 +7,4 @@ rs.initiate({
     { _id: 1, host: "mongodb-1:16969" },
     { _id: 2, host: "mongodb-2:16969" },
   ],
-});
-
-db = conn.getDB("admin");
-db.createUser({
-  user: "dark0ne",
-  pwd: "${MONGODB_ADMIN_PWD}",
-  roles: ["root"],
 });
