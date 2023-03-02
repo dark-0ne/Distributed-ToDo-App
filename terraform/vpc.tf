@@ -49,3 +49,16 @@ resource "google_compute_firewall" "mongodb" {
   source_ranges = ["130.231.0.0/16"]
   target_tags   = ["mongodb"]
 }
+
+resource "google_compute_firewall" "redis" {
+  name = "allow-redis"
+  allow {
+    ports    = ["6379"]
+    protocol = "tcp"
+  }
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["130.231.0.0/16"]
+  target_tags   = ["redis"]
+}

@@ -1,0 +1,16 @@
+- name: Install lsb-release
+  package:
+    name: lsb-release
+    state: latest
+
+
+- name: Add Redis apt repository
+  command: "curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg"
+  command: "echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list"
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install Redis
+    apt:
+      name: redis
