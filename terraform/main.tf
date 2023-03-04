@@ -86,3 +86,30 @@ resource "google_compute_instance" "redis" {
     EOT
   }
 }
+
+resource "google_compute_instance" "nginx" {
+  name         = "nginx-0"
+  machine_type = "e2-small"
+  tags         = ["ssh", "nginx"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 10
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+    EOT
+  }
+}

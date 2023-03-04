@@ -62,3 +62,21 @@ resource "google_compute_firewall" "redis" {
   source_ranges = ["130.231.0.0/16"]
   target_tags   = ["redis"]
 }
+
+resource "google_compute_firewall" "nginx" {
+  name = "allow-http"
+  allow {
+    ports    = ["80", "443"]
+    protocol = "tcp"
+  }
+  allow {
+    ports    = ["80", "443"]
+    protocol = "udp"
+  }
+
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["nginx"]
+}
