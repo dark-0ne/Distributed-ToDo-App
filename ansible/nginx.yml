@@ -1,0 +1,89 @@
+- hosts: nginx
+
+  vars:
+    - certbot_install_method: snap
+    - certbot_auto_renew: true
+    - certbot_auto_renew_hour: "3"
+    - certbot_auto_renew_minute: "30"
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+  roles:
+    - role: nginxinc.nginx
+    - role: geerlingguy.certbot
+
+  tasks:
+    - name: Update Cloudflare DNS record
+      shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/897484a52ad331755d5251b1b3b63b73' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data \"{ 'content':hostvars[inventory_hostname].ansible_host }\""
+      delegate_to: localhost
+      become: false
+
+    - name: Upload nginx sites-available files
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/nginx/config/sites-available/"
+        dest: "/etc/nginx/sites-available/"
+        use_ssh_args: true
+
+    - name: Upload nginx conf files
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/nginx/config/nginx.conf"
+        dest: "/etc/nginx/nginx.conf"
+        use_ssh_args: true
+
+    - name: Upload nginx html files
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/nginx/html/"
+        dest: "/usr/share/nginx/html/"
+        use_ssh_args: true
+
+    - name: Create sites-enabled directory
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-enabled"
+        state: directory
+
+    - name: Enable default nginx config
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/default"
+        dest: "/etc/nginx/sites-enabled/default"
+        state: link
+
+    - name: Restart nginx service
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Upload certbot config
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/nginx/certbot_conf.ini"
+        dest: "/home/dark0ne/"
+        use_ssh_args: true
+
+    - name: Set up certbot
+      shell: certbot certonly --nginx --config /home/dark0ne/certbot_conf.ini -d ds.csilabs.eu --non-interactive
+
+    - name: Initial update for permissions on certbot private keys
+      shell: chmod a+r -R /etc/letsencrypt/archive/ds.csilabs.eu/
+
+    - name: Set up crontab job to update permissions on certbot private keys
+      ansible.builtin.cron:
+        name: "update crontab"
+        minute: "32"
+        hour: "3"
+        job: "chmod a+r -R /etc/letsencrypt/archive/ds.csilabs.eu/"
+
+    - name: Disable default nginx config
+      file: name=/etc/nginx/sites-enabled/default state=absent
+
+    - name: Enable nginx kibana conf files
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/ds.csilabs.eu"
+        dest: "/etc/nginx/sites-enabled/ds.csilabs.eu"
+        state: link
+
+    - name: Restart nginx service
+      service:
+        name: nginx
+        state: restarted

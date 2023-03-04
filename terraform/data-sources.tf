@@ -7,3 +7,11 @@ data "google_secret_manager_secret_version" "vm-public-key" {
 data "google_secret_manager_secret_version" "mongodb-pwd" {
   secret = "MongoDB-Pwd"
 }
+
+data "google_secret_manager_secret_version" "cloudflare-api-key" {
+  secret = "Cloudflare-API-Key"
+}
+
+data "google_secret_manager_secret_version" "cloudflare-api-token" {
+  secret = "Cloudflare-API-Token"
+}
