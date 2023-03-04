@@ -3,20 +3,44 @@
   pre_tasks:
     - name: Update apt cache if required
       apt: update_cache=yes cache_valid_time=86400
+
     - name: Install rsync on Debian_11
       apt:
         name: rsync
   roles:
-    - redis
+    - redis-install
 
-  # tasks:
-  #   - name: Upload custom mongosh scripts to set up users and replica sets
-  #     ansible.posix.synchronize:
-  #       src: "{{playbook_dir}}/../services/mongodb"
-  #       dest: "/home/dark0ne"
-  #       use_ssh_args: true
-  #     run_once: true
-  #
-  #   - name: Run script to set up replicaset
-  #     command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_replicaset.js
-  #     run_once: true- name: Sleep for 300 seconds and continue with play
+  tasks:
+    - name: Create a redis config directory if it does not exist
+      ansible.builtin.file:
+        path: /etc/redis
+        state: directory
+        mode: '0755'
+
+    - name: Create a redis data directory if it does not exist
+      ansible.builtin.file:
+        path: /var/redis/6379
+        state: directory
+        mode: '0755'
+
+    - name: Upload Redis init script
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/redis/redis_init_script"
+        dest: "/etc/init.d/redis_6379"
+        use_ssh_args: true
+
+    - name: Upload Redis config file
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/redis/redis.conf"
+        dest: "/etc/redis/6379.conf"
+        use_ssh_args: true
+
+    - name: Add Redis init script to all runlevels
+      command: update-rc.d redis_6379 defaults
+
+    - name: Start Redis
+      command: /etc/init.d/redis_6379 start
+
+    - name: Create Redis cluster
+      shell: redis-cli --cluster create redis-0:6379 redis-1:6379 redis-2:6379 redis-3:6379 redis-4:6379 redis-5:6379 --cluster-replicas 1 --cluster-yes
+      run_once: true

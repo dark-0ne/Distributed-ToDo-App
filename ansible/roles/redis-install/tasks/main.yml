@@ -1,16 +1,36 @@
-- name: Install lsb-release
+- name: Install lsb-release and pip
   package:
     name: lsb-release
     state: latest
 
+- name: Install pip
+  package:
+    name: python3-pip
+    state: latest
+
+- name: Install pexpect
+  pip:
+    name: pexpect
+
+- name: Add Redis apt gpg key
+  ansible.builtin.expect:
+    command: /bin/bash -c "curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg"
+    responses:
+      "File*" : "y"
 
 - name: Add Redis apt repository
-  command: "curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg"
-  command: "echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list"
+  shell: echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
 
 - name: Update apt cache
   apt: update_cache=yes
 
 - name: Install Redis
-    apt:
-      name: redis
+  apt:
+    name: redis
+
+- name: Stop and disable default redis-server service if started
+  ansible.builtin.service:
+    name: redis-server
+    state: stopped
+    enabled: false
+
