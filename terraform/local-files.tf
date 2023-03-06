@@ -5,6 +5,7 @@ resource "local_sensitive_file" "hosts_ini" {
     mongodb_admin_pwd            = data.google_secret_manager_secret_version.mongodb-pwd.secret_data
     redis                        = google_compute_instance.redis
     nginx                        = google_compute_instance.nginx
+    flask                        = google_compute_instance.flask
     cloudflare-api-key           = data.google_secret_manager_secret_version.cloudflare-api-key.secret_data
     cloudflare-api-token         = data.google_secret_manager_secret_version.cloudflare-api-token.secret_data
     ansible_user                 = "dark0ne"

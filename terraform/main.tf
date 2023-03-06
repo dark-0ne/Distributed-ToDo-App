@@ -113,3 +113,31 @@ resource "google_compute_instance" "nginx" {
     EOT
   }
 }
+
+resource "google_compute_instance" "flask" {
+  name         = "flask-${count.index}"
+  count        = 5
+  machine_type = "e2-small"
+  tags         = ["ssh", "flask"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 20
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+    EOT
+  }
+}

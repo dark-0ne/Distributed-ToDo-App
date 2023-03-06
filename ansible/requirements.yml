@@ -4,3 +4,4 @@ collections:
 roles:
 - name: nginxinc.nginx
 - name: geerlingguy.certbot
+- name: geerlingguy.docker

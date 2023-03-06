@@ -22,10 +22,28 @@ server {
   index index.html;
 
   location / {
-  try_files $uri $uri/ =404;
+    try_files $uri $uri/ =404;
   }
 
   location /images/ {
-        root /usr/share/nginx/html/data/;
+    root /usr/share/nginx/html/data/;
+  }
+  location /api {
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization';
+    add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range';
+
+    proxy_read_timeout 10;
+    proxy_send_timeout 10;
+    send_timeout 60;
+    resolver_timeout 120;
+    client_body_timeout 120;
+
+    proxy_pass "http://flask-0:5000/";
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Prefix /api;
   }
 }

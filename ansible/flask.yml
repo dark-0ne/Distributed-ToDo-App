@@ -1,0 +1,27 @@
+- hosts: flask
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - geerlingguy.docker
+
+  tasks:
+    - name: Take down Flask service if running
+      command: docker-compose down
+      ignore_errors: yes
+      args:
+        chdir: "/home/ubuntu/flask"
+    - name: Upload Flask files
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/flask"
+        dest: "/home/ubuntu"
+        use_ssh_args: true
+    - name: Start Flask service
+      command: docker-compose up --build -d
+      args:
+        chdir: "/home/ubuntu/flask"
