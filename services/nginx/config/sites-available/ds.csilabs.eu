@@ -1,3 +1,11 @@
+upstream flask_api {
+  server flask-0:5000;
+  server flask-1:5000;
+  server flask-2:5000;
+  server flask-3:5000;
+  server flask-4:5000;
+}
+
 server {
   listen 80;
   server_name ds.csilabs.eu;
@@ -28,6 +36,7 @@ server {
   location /images/ {
     root /usr/share/nginx/html/data/;
   }
+
   location /api {
     add_header 'Access-Control-Allow-Origin' '*' always;
     add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
@@ -40,7 +49,7 @@ server {
     resolver_timeout 120;
     client_body_timeout 120;
 
-    proxy_pass "http://flask-0:5000/";
+    proxy_pass "http://flask_api";
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-Host $host;

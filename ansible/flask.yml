@@ -15,13 +15,15 @@
       command: docker-compose down
       ignore_errors: yes
       args:
-        chdir: "/home/ubuntu/flask"
+        chdir: "/home/dark0ne/flask"
     - name: Upload Flask files
       ansible.posix.synchronize:
         src: "{{playbook_dir}}/../services/flask"
-        dest: "/home/ubuntu"
+        dest: "/home/dark0ne"
         use_ssh_args: true
     - name: Start Flask service
       command: docker-compose up --build -d
       args:
-        chdir: "/home/ubuntu/flask"
+        chdir: "/home/dark0ne/flask"
+      environment:
+        PARENT_HOSTNAME: "{{ inventory_hostname }}"

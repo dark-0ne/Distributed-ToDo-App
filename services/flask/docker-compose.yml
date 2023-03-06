@@ -4,3 +4,6 @@ services:
     build: .
     ports:
      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      PARENT_HOSTNAME: ${PARENT_HOSTNAME}
