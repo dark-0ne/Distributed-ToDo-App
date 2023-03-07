@@ -23,8 +23,6 @@
       shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/897484a52ad331755d5251b1b3b63b73' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data '{ \"content\":\"{{ hostvars[inventory_hostname].ansible_host }}\" }'"
       delegate_to: localhost
       become: false
-      tags:
-        - test
 
     - name: Upload nginx sites-available files
       ansible.posix.synchronize:

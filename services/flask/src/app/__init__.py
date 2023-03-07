@@ -16,8 +16,9 @@ def create_app():
 
    @app.route("/")
    def homepage():
+       logger.info(str(request))
        return jsonify(
-           {"status": "OK", "hostname": os.environ.get("PARENT_HOSTNAME")})
+           {"status": "OK", "hostname": os.environ.get("PARENT_HOSTNAME"), "request": request.headers})
 
    return app
 

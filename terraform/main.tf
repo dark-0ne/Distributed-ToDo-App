@@ -55,6 +55,7 @@ resource "google_compute_instance" "mongodb" {
   metadata = {
     "ssh-keys" = <<EOT
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
 }
@@ -83,6 +84,7 @@ resource "google_compute_instance" "redis" {
   metadata = {
     "ssh-keys" = <<EOT
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
 }
@@ -110,6 +112,7 @@ resource "google_compute_instance" "nginx" {
   metadata = {
     "ssh-keys" = <<EOT
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
 }
@@ -138,6 +141,7 @@ resource "google_compute_instance" "flask" {
   metadata = {
     "ssh-keys" = <<EOT
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
 }
