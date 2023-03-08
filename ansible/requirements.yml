@@ -5,3 +5,4 @@ roles:
 - name: nginxinc.nginx
 - name: geerlingguy.certbot
 - name: geerlingguy.docker
+- name: googlecloudplatform.google_cloud_ops_agents
