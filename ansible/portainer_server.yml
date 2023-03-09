@@ -1,6 +1,10 @@
 - hosts: portainer-server
   become: true
   pre_tasks:
+    - name: Update Cloudflare DNS record
+      shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/52a47107a79ba6f2189ec6795ab6f81a' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data '{ \"content\":\"{{ hostvars[inventory_hostname].ansible_host }}\" }'"
+      delegate_to: localhost
+      become: false
     - name: Update apt cache if required
       apt: update_cache=yes cache_valid_time=86400
 
@@ -26,11 +30,10 @@
         name: portainer_server
         published_ports:
           - 8000:8000
-          - 9443:9443
+          - 443:9443
         restart_policy: always
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
         image: portainer/portainer-ce:latest
 
-# docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ee:latest

@@ -1,0 +1,38 @@
+- hosts: mongo-express
+  become: true
+  pre_tasks:
+    - name: Update Cloudflare DNS record
+      shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/afe7cd5f6e7f65e8b10b7504c4e49503' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data '{ \"content\":\"{{ hostvars[inventory_hostname].ansible_host }}\" }'"
+      delegate_to: localhost
+      become: false
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.pip
+
+  tasks:
+    - name: Install docker python package
+      ansible.builtin.pip:
+        name: docker
+
+    - name: Run mongo express docker container
+      docker_container:
+        name: mongo_express
+        published_ports:
+          - 80:8081
+        restart_policy: always
+        image: mongo-express:latest
+        env:
+          ME_CONFIG_MONGODB_URL: "mongodb://dark0ne:{{ mongodb_admin_pwd }}@mongodb-router-0:16985,mongodb-router-1:16985,mongodb-router-2:16985"
+          ME_CONFIG_MONGODB_AUTH_DATABASE: "admin"
+          ME_CONFIG_MONGODB_AUTH_USERNAME: "dark0ne"
+          ME_CONFIG_MONGODB_AUTH_PASSWORD: "{{ mongodb_admin_pwd }}"
+          ME_CONFIG_SITE_COOKIESECRET: "cookie_secret"
+          ME_CONFIG_SITE_SESSIONSECRET: "session_secret"
+

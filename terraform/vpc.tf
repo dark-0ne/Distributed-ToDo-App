@@ -76,6 +76,19 @@ resource "google_compute_firewall" "mongodb-router" {
   target_tags   = ["mongodb-router"]
 }
 
+resource "google_compute_firewall" "mongo-express" {
+  name = "allow-mongo-express"
+  allow {
+    ports    = ["80"]
+    protocol = "tcp"
+  }
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["130.231.0.0/16"]
+  target_tags   = ["mongoexpress"]
+}
+
 resource "google_compute_firewall" "redis" {
   name = "allow-redis"
   allow {
@@ -124,7 +137,7 @@ resource "google_compute_firewall" "flask" {
 resource "google_compute_firewall" "portainer" {
   name = "allow-portainer"
   allow {
-    ports    = ["8000", "9443"]
+    ports    = ["8000", "443"]
     protocol = "tcp"
   }
 

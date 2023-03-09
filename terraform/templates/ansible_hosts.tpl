@@ -23,6 +23,9 @@ ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} p
 ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
 %{endfor~}
 
+[mongo-express]
+${mongo-express.name} ansible_host=${mongo-express.network_interface[0].access_config[0].nat_ip} private_ip=${mongo-express.network_interface[0].network_ip} cloudflare_api_key=${cloudflare-api-key}
+
 [redis]
 %{for host in redis~}
 ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
@@ -37,7 +40,7 @@ ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} p
 %{endfor~}
 
 [portainer-server]
-${portainer-server.name} ansible_host=${portainer-server.network_interface[0].access_config[0].nat_ip} private_ip=${portainer-server.network_interface[0].network_ip}
+${portainer-server.name} ansible_host=${portainer-server.network_interface[0].access_config[0].nat_ip} private_ip=${portainer-server.network_interface[0].network_ip} cloudflare_api_key=${cloudflare-api-key}
 
 [all:vars]
 ansible_user=${ansible_user}
