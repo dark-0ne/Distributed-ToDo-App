@@ -9,6 +9,8 @@
         name: rsync
   roles:
     - geerlingguy.docker
+    - geerlingguy.pip
+    - portainer-agent
 
   tasks:
     - name: Take down Flask service if running

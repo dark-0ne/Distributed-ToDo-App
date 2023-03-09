@@ -1,0 +1,36 @@
+- hosts: portainer-server
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.pip
+
+  tasks:
+    - name: Install docker python package
+      ansible.builtin.pip:
+        name: docker
+
+    - name: Create Portainer data volume
+      docker_volume:
+        name: portainer_data
+
+    - name: Run portainer server docker container
+      docker_container:
+        name: portainer_server
+        published_ports:
+          - 8000:8000
+          - 9443:9443
+        restart_policy: always
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+        image: portainer/portainer-ce:latest
+
+# docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ee:latest

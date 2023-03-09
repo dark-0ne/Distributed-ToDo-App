@@ -8,6 +8,10 @@
   become: true
 
   pre_tasks:
+    - name: Update Cloudflare DNS record
+      shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/897484a52ad331755d5251b1b3b63b73' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data '{ \"content\":\"{{ hostvars[inventory_hostname].ansible_host }}\" }'"
+      delegate_to: localhost
+      become: false
     - name: Update apt cache if required
       apt: update_cache=yes cache_valid_time=86400
     - name: Install rsync on Debian_11
@@ -19,11 +23,6 @@
     - role: geerlingguy.certbot
 
   tasks:
-    - name: Update Cloudflare DNS record
-      shell: "curl -sX PATCH 'https://api.cloudflare.com/client/v4/zones/69265e1505747ca7b0ba0b138f3efd74/dns_records/897484a52ad331755d5251b1b3b63b73' -H 'x-auth-email: Khoshkholgh.danial@gmail.com' -H 'x-auth-key: {{ hostvars[inventory_hostname].cloudflare_api_key }}' -H 'Content-Type: application/json' --data '{ \"content\":\"{{ hostvars[inventory_hostname].ansible_host }}\" }'"
-      delegate_to: localhost
-      become: false
-
     - name: Upload nginx sites-available files
       ansible.posix.synchronize:
         src: "{{playbook_dir}}/../services/nginx/config/sites-available/"
@@ -64,9 +63,9 @@
         dest: "/home/dark0ne/"
         use_ssh_args: true
 
-    - name: Wait 3 minutes for DNS record to be updated
+    - name: Wait 1 minute for DNS record to be updated
       ansible.builtin.wait_for:
-        timeout: 180
+        timeout: 60
       delegate_to: localhost
       become: false
       tags:

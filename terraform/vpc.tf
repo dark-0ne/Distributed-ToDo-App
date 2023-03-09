@@ -120,3 +120,17 @@ resource "google_compute_firewall" "flask" {
   source_ranges = ["130.231.0.0/16"]
   target_tags   = ["flask"]
 }
+
+resource "google_compute_firewall" "portainer" {
+  name = "allow-portainer"
+  allow {
+    ports    = ["8000", "9443"]
+    protocol = "tcp"
+  }
+
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["130.231.0.0/16"]
+  target_tags   = ["portainer"]
+}

@@ -263,3 +263,31 @@ resource "google_compute_instance" "flask" {
     EOT
   }
 }
+
+resource "google_compute_instance" "portainer-server" {
+  name         = "portainer-server-0"
+  machine_type = "e2-medium"
+  tags         = ["ssh", "portainer"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 15
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+}
