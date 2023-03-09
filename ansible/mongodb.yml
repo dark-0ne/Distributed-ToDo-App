@@ -1,4 +1,5 @@
-- hosts: mongodb
+# Set up config servers replicaset
+- hosts: mongodb-cfgsrv
   become: true
   pre_tasks:
     - name: Update apt cache if required
@@ -9,8 +10,9 @@
   roles:
     - community.mongodb.mongodb_linux
     - community.mongodb.mongodb_repository
-    - { role: community.mongodb.mongodb_install }
-    - { role: community.mongodb.mongodb_mongod, authorization: false, mongod_port: 16969, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false }
+    - mongodb-preinstall
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_config, authorization: false, config_port: 18585, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false }
 
   tasks:
     - name: Upload custom mongosh scripts to set up users and replica sets
@@ -21,7 +23,7 @@
       run_once: true
 
     - name: Run script to set up replicaset
-      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_replicaset.js
+      command: mongosh localhost:18585 /home/dark0ne/mongodb/setup_cfg_replicaset.js
       run_once: true
 
     - name: Wait for replicaset to come online
@@ -31,14 +33,91 @@
       become: false
 
     - name: Run script to set up users
-      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_users.js
+      command: mongosh localhost:18585 /home/dark0ne/mongodb/setup_cfg_users.js
       environment:
         MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
       run_once: true
 
 
-- hosts: mongodb
+- hosts: mongodb-cfgsrv
   become: true
   roles:
-    - { role: community.mongodb.mongodb_mongod, mongod_port: 16969, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false }
+    - { role: community.mongodb.mongodb_config, config_port: 18585, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false }
+
+# Set up shard replicasets
+- hosts: mongodb-shard0, mongodb-shard1, mongodb-shard2
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_repository
+    - mongodb-preinstall
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongod, authorization: false, mongod_port: 16969, repl_set_name: "{{ group_names[0] }}", bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false, sharding: true}
+
+  tasks:
+    - name: Upload custom mongosh scripts to set up users and replica sets
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/mongodb"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+    - name: Run script to set up replicaset
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_shard_replicaset.js
+      environment:
+        REPL_SET_NAME: "{{ group_names[0] }}"
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+    - name: Wait for replicaset to come online
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+      become: false
+
+    - name: Run script to set up users
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_shard_users.js
+      environment:
+        MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+- hosts: mongodb-shard0, mongodb-shard1, mongodb-shard2
+  become: true
+  roles:
+    - { role: community.mongodb.mongodb_mongod, mongod_port: 16969, repl_set_name: "{{ group_names[0] }}", bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false, sharding: true}
+
+# Set up mongos router instances
+- hosts: mongodb-router
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_repository
+    - mongodb-preinstall
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongos, config_servers: 'mongodb-cfgsrv-0:18585,mongodb-cfgsrv-1:18585,mongodb-cfgsrv-2:18585', mongos_port: 16985, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false}
+
+  tasks:
+    - name: Upload custom mongosh scripts to add shards
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/mongodb"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+      run_once: true
+
+    - name: Run script to add shards
+      command: mongosh localhost:16985 -u dark0ne -p '{{ mongodb_admin_pwd }}' /home/dark0ne/mongodb/setup_mongos_shards.js
+      environment:
+        MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
+      run_once: true
 

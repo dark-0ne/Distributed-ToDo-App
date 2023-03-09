@@ -37,8 +37,8 @@ resource "google_compute_firewall" "ssh" {
   target_tags   = ["ssh"]
 }
 
-resource "google_compute_firewall" "mongodb" {
-  name = "allow-mongodb"
+resource "google_compute_firewall" "mongodb-shard" {
+  name = "allow-mongodb-shard"
   allow {
     ports    = ["16969"]
     protocol = "tcp"
@@ -47,7 +47,33 @@ resource "google_compute_firewall" "mongodb" {
   network       = google_compute_network.vpc_network.id
   priority      = 1000
   source_ranges = ["130.231.0.0/16"]
-  target_tags   = ["mongodb"]
+  target_tags   = ["mongodb-shard"]
+}
+
+resource "google_compute_firewall" "mongodb-cfgsrv" {
+  name = "allow-mongodb-cfgsrv"
+  allow {
+    ports    = ["18585"]
+    protocol = "tcp"
+  }
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["130.231.0.0/16"]
+  target_tags   = ["mongodb-cfgsrv"]
+}
+
+resource "google_compute_firewall" "mongodb-router" {
+  name = "allow-mongodb-router"
+  allow {
+    ports    = ["16985"]
+    protocol = "tcp"
+  }
+  direction     = "INGRESS"
+  network       = google_compute_network.vpc_network.id
+  priority      = 1000
+  source_ranges = ["130.231.0.0/16"]
+  target_tags   = ["mongodb-router"]
 }
 
 resource "google_compute_firewall" "redis" {

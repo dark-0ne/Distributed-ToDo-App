@@ -1,5 +1,25 @@
-[mongodb]
-%{for host in mongodb~}
+[mongodb-shard0]
+%{for host in mongodb-shard0~}
+${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
+%{endfor~}
+
+[mongodb-shard1]
+%{for host in mongodb-shard1~}
+${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
+%{endfor~}
+
+[mongodb-shard2]
+%{for host in mongodb-shard2~}
+${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
+%{endfor~}
+
+[mongodb-cfgsrv]
+%{for host in mongodb-cfgsrv~}
+${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
+%{endfor~}
+
+[mongodb-router]
+%{for host in mongodb-router~}
 ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} private_ip=${host.network_interface[0].network_ip}
 %{endfor~}
 
@@ -9,7 +29,7 @@ ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} p
 %{endfor~}
 
 [nginx]
-${nginx.name} ansible_host=${nginx.network_interface[0].access_config[0].nat_ip} private_ip=${nginx.network_interface[0].network_ip} cloudflare_api_key=${cloudflare-api-key} cloudflare_api_token=${cloudflare-api-token}
+${nginx.name} ansible_host=${nginx.network_interface[0].access_config[0].nat_ip} private_ip=${nginx.network_interface[0].network_ip} cloudflare_api_key=${cloudflare-api-key}
 
 [flask]
 %{for host in flask~}

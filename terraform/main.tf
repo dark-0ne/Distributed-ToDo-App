@@ -31,16 +31,17 @@ resource "google_storage_bucket" "default" {
 }
 
 # Setup VMs
-resource "google_compute_instance" "mongodb" {
-  name         = "mongodb-${count.index}"
+resource "google_compute_instance" "mongodb-shard0" {
+  name         = "mongodb-shard0-${count.index}"
   count        = 3
-  machine_type = "e2-medium"
-  tags         = ["ssh", "mongodb"]
+  machine_type = var.mongodb_shard_vm_type
+  tags         = ["ssh", "mongodb-shard"]
 
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
-      size  = 25
+      size  = 50
+      type  = "pd-ssd"
     }
   }
 
@@ -60,16 +61,133 @@ resource "google_compute_instance" "mongodb" {
   }
 }
 
+resource "google_compute_instance" "mongodb-shard1" {
+  name         = "mongodb-shard1-${count.index}"
+  count        = 3
+  machine_type = var.mongodb_shard_vm_type
+  tags         = ["ssh", "mongodb-shard"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 50
+      type  = "pd-ssd"
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+}
+
+resource "google_compute_instance" "mongodb-shard2" {
+  name         = "mongodb-shard2-${count.index}"
+  count        = 3
+  machine_type = var.mongodb_shard_vm_type
+  tags         = ["ssh", "mongodb-shard"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 50
+      type  = "pd-ssd"
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+}
+
+resource "google_compute_instance" "mongodb-cfgsrv" {
+  name         = "mongodb-cfgsrv-${count.index}"
+  count        = 3
+  machine_type = "e2-standard-2"
+  tags         = ["ssh", "mongodb-cfgsrv"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 50
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+}
+
+resource "google_compute_instance" "mongodb-router" {
+  name         = "mongodb-router-${count.index}"
+  count        = 3
+  machine_type = var.mongodb_router_vm_type
+  tags         = ["ssh", "mongodb-router"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 50
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+}
 resource "google_compute_instance" "redis" {
   name         = "redis-${count.index}"
   count        = 6
-  machine_type = "e2-medium"
+  machine_type = var.redis_vm_type
   tags         = ["ssh", "redis"]
 
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
-      size  = 20
+      size  = 50
     }
   }
 
@@ -91,7 +209,7 @@ resource "google_compute_instance" "redis" {
 
 resource "google_compute_instance" "nginx" {
   name         = "nginx-0"
-  machine_type = "e2-small"
+  machine_type = var.nginx_vm_type
   tags         = ["ssh", "nginx"]
 
   boot_disk {
@@ -120,13 +238,13 @@ resource "google_compute_instance" "nginx" {
 resource "google_compute_instance" "flask" {
   name         = "flask-${count.index}"
   count        = 5
-  machine_type = "e2-small"
+  machine_type = var.flask_vm_type
   tags         = ["ssh", "flask"]
 
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
-      size  = 20
+      size  = 25
     }
   }
 
