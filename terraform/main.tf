@@ -59,6 +59,11 @@ resource "google_compute_instance" "mongodb-shard0" {
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
 
 resource "google_compute_instance" "mongodb-shard1" {
@@ -88,6 +93,11 @@ resource "google_compute_instance" "mongodb-shard1" {
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
   }
 }
 
@@ -119,6 +129,11 @@ resource "google_compute_instance" "mongodb-shard2" {
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
 
 resource "google_compute_instance" "mongodb-cfgsrv" {
@@ -147,6 +162,11 @@ resource "google_compute_instance" "mongodb-cfgsrv" {
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
   }
 }
 
@@ -177,6 +197,11 @@ resource "google_compute_instance" "mongodb-router" {
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
 
 resource "google_compute_instance" "mongo-express" {
@@ -204,6 +229,11 @@ resource "google_compute_instance" "mongo-express" {
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
   }
 }
 
@@ -234,6 +264,11 @@ resource "google_compute_instance" "redis" {
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
 
 resource "google_compute_instance" "nginx" {
@@ -261,6 +296,11 @@ resource "google_compute_instance" "nginx" {
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
   }
 }
 
@@ -291,6 +331,11 @@ resource "google_compute_instance" "flask" {
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
   }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
 
 resource "google_compute_instance" "portainer-server" {
@@ -318,5 +363,10 @@ resource "google_compute_instance" "portainer-server" {
       dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
       mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
     EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
   }
 }

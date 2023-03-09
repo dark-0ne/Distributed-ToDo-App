@@ -19,3 +19,7 @@ data "google_secret_manager_secret_version" "cloudflare-api-key" {
 data "google_secret_manager_secret_version" "cloudflare-api-token" {
   secret = "Cloudflare-API-Token"
 }
+
+data "google_service_account" "default" {
+  account_id = "113959569811714640508"
+}
