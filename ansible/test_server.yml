@@ -1,0 +1,32 @@
+- hosts: test-server
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+    - name: Install rsync and htop on Debian_11
+      apt:
+        name:
+          - rsync
+          - htop
+  roles:
+    - geerlingguy.pip
+
+  tasks:
+    - name: Upload test scripts
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/test_scripts"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+      tags:
+        - upload_scripts
+
+    - name: Create a log directory if it does not exist
+      ansible.builtin.file:
+        path: /home/dark0ne/test_scripts/logs
+        state: directory
+        mode: '0755'
+
+    - name: Install pip packages
+      ansible.builtin.pip:
+        requirements: /home/dark0ne/test_scripts/requirements.txt

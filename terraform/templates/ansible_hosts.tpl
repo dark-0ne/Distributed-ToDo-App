@@ -42,6 +42,9 @@ ${host.name} ansible_host=${host.network_interface[0].access_config[0].nat_ip} p
 [portainer-server]
 ${portainer-server.name} ansible_host=${portainer-server.network_interface[0].access_config[0].nat_ip} private_ip=${portainer-server.network_interface[0].network_ip} cloudflare_api_key=${cloudflare-api-key}
 
+[test-server]
+${test-server.name} ansible_host=${test-server.network_interface[0].access_config[0].nat_ip} private_ip=${test-server.network_interface[0].network_ip}
+
 [all:vars]
 ansible_user=${ansible_user}
 ansible_ssh_private_key_file=${ansible_ssh_private_key_file}

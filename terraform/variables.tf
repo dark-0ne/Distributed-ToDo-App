@@ -9,3 +9,5 @@ variable "redis_vm_type" {}
 variable "nginx_vm_type" {}
 
 variable "flask_vm_type" {}
+
+variable "test_vm_type" {}

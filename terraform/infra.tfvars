@@ -7,3 +7,5 @@ redis_vm_type = "e2-standard-4"
 nginx_vm_type = "c2-standard-8"
 
 flask_vm_type = "e2-standard-4"
+
+test_vm_type = "e2-highcpu-8"
