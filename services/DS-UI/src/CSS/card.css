@@ -1,0 +1,14 @@
+.card {
+  border-radius: 20px;
+}
+.card .icons-container {
+  background-color: var(--primary-color);
+  border-radius: 20px;
+  color: white;
+}
+.card .icons-container a {
+  color: white;
+}
+.card .icons-container a:hover {
+  color: rgb(183, 73, 73);
+}
