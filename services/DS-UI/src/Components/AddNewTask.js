@@ -11,9 +11,8 @@ function AddNewTask(props) {
     title: "",
     description: "",
     date: "",
+    done: false,
   });
-  // const [taskText, setTaskText] = useState("");
-  // const [taskDate, setTaskDate] = useState("");
 
   const handleInputChanges = (event) => {
     const { name, value } = event.target;
@@ -27,17 +26,9 @@ function AddNewTask(props) {
 
     console.log("the submit button is working");
     console.log(newTask);
-    // updateNewtask;
-    // props.addTask({
-    //   text: taskText,
-    //   date: taskDate,
-    // });
-    // console.log(taskDate, taskText);
-    // Clear the form and hide the modal
-    // setTaskText("");
-    // setTaskDate("");
+
     setNewTask({ title: "", description: "", date: "" });
-    // props.toggleModal;
+
     props.toggleModal();
   };
   const cancelModal = () => {
@@ -53,7 +44,7 @@ function AddNewTask(props) {
 
       {/* <Modal show={showModal} onHide={() => setShowModal(false)}> */}
       <Modal show={props.showModal}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <Modal.Title>Add New Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>

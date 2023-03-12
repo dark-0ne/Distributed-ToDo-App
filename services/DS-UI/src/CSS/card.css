@@ -1,14 +1,44 @@
 .card {
   border-radius: 20px;
 }
+
 .card .icons-container {
-  background-color: var(--primary-color);
-  border-radius: 20px;
-  color: white;
+  /* background-color: var(--primary-color); */
+  /* border-radius: 20px; */
 }
 .card .icons-container a {
-  color: white;
+  /* color: white; */
+  color: var(--secondary-color);
 }
 .card .icons-container a:hover {
   color: rgb(183, 73, 73);
+}
+.done {
+  background-color: rgb(176, 176, 176) !important;
+}
+.form-check {
+  padding-left: 30px;
+}
+.icons {
+  width: 25px;
+  height: 25px;
+}
+input[type="checkbox"] {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* Make the checkbox round */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+  border: 2px solid var(--secondary-color);
+}
+
+/* Set the background color of the checkbox when checked */
+input[type="checkbox"]:checked {
+  background-color: var(--secondary-color);
+  border: none;
 }
