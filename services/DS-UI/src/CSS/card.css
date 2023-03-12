@@ -1,20 +1,22 @@
 .card {
   border-radius: 20px;
 }
+.card-title {
+  color: var(--secondary-color);
+}
 
 .card .icons-container {
   /* background-color: var(--primary-color); */
   /* border-radius: 20px; */
 }
 .card .icons-container a {
-  /* color: white; */
   color: var(--secondary-color);
 }
 .card .icons-container a:hover {
-  color: rgb(183, 73, 73);
+  color: var(--primary-color);
 }
 .done {
-  background-color: rgb(176, 176, 176) !important;
+  background-color: rgba(202, 82, 136, 0.3) !important;
 }
 .form-check {
   padding-left: 30px;

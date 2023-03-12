@@ -12,40 +12,64 @@ function Main() {
     title: "",
     description: "",
     date: "",
-    done: false,
+    isDone: false,
   });
 
   const handleInputChanges = (event) => {
     const { name, value } = event.target;
     setNewTask({ ...newTask, [name]: value });
   };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // Perform any necessary data processing and validation
-    // before calling the callback function to add the new task
     setAllTasks((prevState) => [...prevState, newTask]);
-    console.log("the submit button is working");
-    console.log(newTask);
-    console.log("alltasksare:", allTasks);
-
     setNewTask({
       id: nanoid(),
       title: "",
       description: "",
       date: "",
-      done: false,
+      isDone: false,
     });
   };
+
+  const toggleIsDone = (taskId, toggledDone) => {
+    console.log("toggleIsDone states", toggledDone);
+    const doneTasks = allTasks.map((task) =>
+      taskId === task.id ? { ...task, isDone: toggledDone } : task
+    );
+    setAllTasks((prevTasks) => {
+      return doneTasks;
+    });
+    console.log("doneTAsks:", doneTasks);
+    console.log("all tasks:", allTasks);
+  };
+
   const deleteTask = (event, taskId) => {
     console.log("deleted event is:", taskId);
     setAllTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
+  // Editing
+  // const editTask = (taskId, editedTitle, editedDescription, editedDate) => {
+  //   console.log("edited task id is:", taskId);
+  //   const updatedTasks = allTasks.map((task) =>
+  //     taskId === task.id
+  //       ? {
+  //           ...task,
+  //           title: editedTitle,
+  //           Description: editedDescription,
+  //           date: editedDate,
+  //         }
+  //       : task
+  //   );
+  //   setAllTasks(updatedTasks);
+  // };
   return (
     <div className="container-fluid  main">
       {/* Adding a new Task  */}
-      <div className="addNewTask row ">
-        <h4 className="text-center addNewTask__title">Add a new task</h4>
+      <div className="addNewTask row">
+        <h4 className="text-center addNewTask__title fw-bolder">
+          Add a new task
+        </h4>
 
         <Form onSubmit={handleSubmit} className="row">
           <div className="row mt-2">
@@ -53,6 +77,7 @@ function Main() {
               <Form.Group controlId="formTaskText">
                 {/* <Form.Label>Title</Form.Label> */}
                 <Form.Control
+                  className="fs-5 fw-bol"
                   name="title"
                   type="text"
                   value={newTask.title}
@@ -67,6 +92,7 @@ function Main() {
               <Form.Group controlId="formTaskDate">
                 {/* <Form.Label>Due Date</Form.Label> */}
                 <Form.Control
+                  className="fs-5 fw-bold"
                   name="date"
                   type="date"
                   value={newTask.date}
@@ -79,7 +105,7 @@ function Main() {
               <Button
                 variant="primary"
                 onClick={handleSubmit}
-                className=" btn "
+                className="btn fs-5 fw-bold"
               >
                 Add Task
               </Button>
@@ -90,6 +116,7 @@ function Main() {
               <Form.Group controlId="formTaskText">
                 {/* <Form.Label>Description</Form.Label> */}
                 <Form.Control
+                  className="fs-5 fw-bold"
                   name="description"
                   type="text"
                   value={newTask.description}
@@ -113,6 +140,8 @@ function Main() {
               description={task.description}
               date={task.date}
               deleteTask={deleteTask}
+              isDone={task.done}
+              toggleIsDone={toggleIsDone}
             />
           ))}
 

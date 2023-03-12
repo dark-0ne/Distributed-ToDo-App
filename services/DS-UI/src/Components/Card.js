@@ -4,10 +4,13 @@ import "../CSS/card.css";
 
 const Card = (props) => {
   const [done, setDone] = useState(false);
-
   const handleToggle = () => {
-    setDone(!done);
+    setDone((prevDone) => {
+      props.toggleIsDone(props.id, !prevDone);
+      return !prevDone;
+    });
   };
+
   return (
     <div className={done ? "card mt-4 px-4 done" : "card mt-4 px-4"}>
       <div
@@ -27,7 +30,9 @@ const Card = (props) => {
         </div>
 
         <div className="col">
-          {/* <h5 className="card-title">{props.title}</h5> */}
+          <h5 className="card-title fw-bolder fs-3 ">
+            {done ? <s>{props.title}</s> : props.title}
+          </h5>
 
           <p className="card-text">
             {done ? <s>{props.description}</s> : props.description}
