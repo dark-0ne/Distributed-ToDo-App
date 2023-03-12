@@ -13,6 +13,7 @@ resource "local_sensitive_file" "hosts_ini" {
     flask                        = google_compute_instance.flask
     portainer-server             = google_compute_instance.portainer-server
     test-server                  = google_compute_instance.test-server
+    react-server                 = google_compute_instance.react-server
     cloudflare-api-key           = data.google_secret_manager_secret_version.cloudflare-api-key.secret_data
     ansible_user                 = var.ANSIBLE_USER
     ansible_ssh_private_key_file = "~/.ssh/gcp_ds_rsa"

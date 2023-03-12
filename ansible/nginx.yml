@@ -28,12 +28,16 @@
         src: "{{playbook_dir}}/../services/nginx/config/sites-available/"
         dest: "/etc/nginx/sites-available/"
         use_ssh_args: true
+      tags:
+        - update_confs
 
     - name: Upload nginx conf files
       ansible.posix.synchronize:
         src: "{{playbook_dir}}/../services/nginx/config/nginx.conf"
         dest: "/etc/nginx/nginx.conf"
         use_ssh_args: true
+      tags:
+        - update_confs
 
     - name: Upload nginx html files
       ansible.posix.synchronize:
@@ -56,6 +60,9 @@
       service:
         name: nginx
         state: restarted
+      tags:
+        - update_confs
+
 
     - name: Upload certbot config
       ansible.posix.synchronize:

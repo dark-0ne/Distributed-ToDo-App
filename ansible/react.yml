@@ -1,0 +1,29 @@
+- hosts: react-server
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - buluma.npm
+
+  tasks:
+    - name: Upload React files
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/DS-UI"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+
+    - name: Install react dependencies
+      command: npm install
+      args:
+        chdir: "/home/dark0ne/DS-UI/"
+
+    - name: Start react service
+      shell: nohup npm start > react.log &
+      args:
+        chdir: "/home/dark0ne/DS-UI/"
+      become: false

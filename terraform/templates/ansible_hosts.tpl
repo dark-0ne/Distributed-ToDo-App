@@ -45,6 +45,9 @@ ${portainer-server.name} ansible_host=${portainer-server.network_interface[0].ac
 [test-server]
 ${test-server.name} ansible_host=${test-server.network_interface[0].access_config[0].nat_ip} private_ip=${test-server.network_interface[0].network_ip}
 
+[react-server]
+${react-server.name} ansible_host=${react-server.network_interface[0].access_config[0].nat_ip} private_ip=${react-server.network_interface[0].network_ip}
+
 [all:vars]
 ansible_user=${ansible_user}
 ansible_ssh_private_key_file=${ansible_ssh_private_key_file}

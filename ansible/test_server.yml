@@ -26,6 +26,8 @@
         path: /home/dark0ne/test_scripts/logs
         state: directory
         mode: '0755'
+        owner: dark0ne
+        group: dark0ne
 
     - name: Install pip packages
       ansible.builtin.pip:

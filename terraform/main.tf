@@ -403,3 +403,36 @@ resource "google_compute_instance" "test-server" {
     scopes = ["cloud-platform"]
   }
 }
+
+resource "google_compute_instance" "react-server" {
+  name         = "react-server-0"
+  machine_type = "e2-standard-2"
+  tags         = ["ssh", "react"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 10
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      # Include this section to give the VM an external IP address
+    }
+  }
+
+  metadata = {
+    "ssh-keys" = <<EOT
+      dark0ne:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key.secret_data} dark0ne@gmail.com
+      mehrdad:ssh-rsa ${data.google_secret_manager_secret_version.vm-public-key-2.secret_data} kahe.mehrdad@gmail.com
+    EOT
+  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = data.google_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
+}

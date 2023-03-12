@@ -7,3 +7,4 @@ roles:
 - name: geerlingguy.docker
 - name: geerlingguy.pip
 - name: googlecloudplatform.google_cloud_ops_agents
+- name: buluma.npm
