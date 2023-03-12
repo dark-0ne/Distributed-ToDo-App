@@ -10,7 +10,10 @@ const Card = (props) => {
   };
   return (
     <div className={done ? "card mt-4 px-4 done" : "card mt-4 px-4"}>
-      <div className="card-body row justify-content-center align-items-center ">
+      <div
+        className="card-body row justify-content-center align-items-center "
+        key={props.id}
+      >
         <div className="form-check col-1">
           <input
             type="checkbox"
@@ -33,11 +36,15 @@ const Card = (props) => {
           <p className="card-text">{done ? <s>{props.date}</s> : props.date}</p>
         </div>
         <div className=" col-1 d-flex icons-container justify-content-end align-items-center">
-          <a href="#" className="p-2">
+          <a href="#" className="p-2 editIcon">
             <BsPencil className="icons" />
           </a>
-          <a href="#" className="">
-            <BsFillTrash3Fill className="icons" />
+          <a
+            href="#"
+            className="deleteIcon"
+            onClick={(event) => props.deleteTask(event, props.id)}
+          >
+            <BsFillTrash3Fill className="icons " />
           </a>
         </div>
       </div>

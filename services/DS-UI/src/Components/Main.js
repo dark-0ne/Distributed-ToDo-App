@@ -3,10 +3,12 @@ import { Button, Form } from "react-bootstrap";
 import AddNewTask from "./AddNewTask";
 import "../CSS/main.css";
 import Card from "./Card";
+import { nanoid } from "nanoid";
 
 function Main() {
   const [allTasks, setAllTasks] = useState([]);
   const [newTask, setNewTask] = useState({
+    id: nanoid(),
     title: "",
     description: "",
     date: "",
@@ -27,7 +29,17 @@ function Main() {
     console.log(newTask);
     console.log("alltasksare:", allTasks);
 
-    setNewTask({ title: "", description: "", date: "", done: false });
+    setNewTask({
+      id: nanoid(),
+      title: "",
+      description: "",
+      date: "",
+      done: false,
+    });
+  };
+  const deleteTask = (event, taskId) => {
+    console.log("deleted event is:", taskId);
+    setAllTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
   };
   return (
     <div className="container-fluid  main">
@@ -96,13 +108,15 @@ function Main() {
           {allTasks.reverse().map((task) => (
             <Card
               key={task.id}
+              id={task.id}
               title={task.title}
               description={task.description}
               date={task.date}
+              deleteTask={deleteTask}
             />
           ))}
 
-          <Card
+          {/* <Card
             title="Card Title 1"
             description="Card Description 1"
             date="2022-03-01"
@@ -116,7 +130,7 @@ function Main() {
             title="Card Title 1"
             description="Card Description 1"
             date="2022-03-01"
-          />
+          /> */}
         </div>
         {/* <div className="col-md-4 border">
           <h4>Tomorrow's</h4>
