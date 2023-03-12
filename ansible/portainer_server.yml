@@ -36,4 +36,5 @@
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
         image: portainer/portainer-ce:latest
+# password: AdminnimdA1234
 
