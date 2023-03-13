@@ -19,3 +19,10 @@ resource "local_sensitive_file" "hosts_ini" {
     ansible_ssh_private_key_file = "~/.ssh/gcp_ds_rsa"
   })
 }
+
+resource "local_sensitive_file" "test_scripts_env" {
+  filename = "../services/test_scripts/.env"
+  content  = <<EOT
+MONGODB_CONNECTION_URL='mongodb://dark0ne:${data.google_secret_manager_secret_version.mongodb-pwd.secret_data}@mongodb-router-0:16985,mongodb-router-1:16985,mongodb-router-2:16985'
+EOT
+}

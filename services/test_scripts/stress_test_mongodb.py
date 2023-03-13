@@ -1,16 +1,19 @@
 #!/bin/python3
-
 import sys
 import os
 import time
 import datetime
 import logging
 import socket
+import random
+import string
 from optparse import OptionParser
 from statistics import mean
+from multiprocessing import Process, Manager
 
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from faker import Faker
 
 
 _name = 'mongodb_stress_test'
@@ -29,51 +32,64 @@ log.setLevel(logging.DEBUG)
 DB_NAME = 'todo-app'
 COLLECTION_NAME = 'users'
 
+letters = string.ascii_lowercase
 
-def mongo_inserter(cid, ndocs, host, port):
+
+def mongo_inserter(cid, ndocs, connection_string, avg_times):
 
     s = socket.getfqdn()
-    log.info("inserter.start client={i} node={n} server={h}:{p}".format(
-             i=cid, n=s, h=host, p=port))
-    conn = MongoClient(host, port)
+    conn = MongoClient(connection_string)
     db = conn[DB_NAME]
     collection = db[COLLECTION_NAME]
     insert_times = []
+    fake = Faker()
     for n in range(ndocs):
-        message = "updating mongodb with value {v} from client {i}".format(
-            v=n, i=cid)
         #log.info(message)
-        doc = {}
+        doc = {
+            "title": "".join(
+                random.choices(letters, k=random.randint(10, 32))),
+            "description": "".join(
+                random.choices(letters, k=random.randint(20, 256))),
+            "completed": random.choice((True, False)),
+            "created_at": fake.date_time_this_year()}
         t0 = time.time()
         collection.insert_one(doc)
         tf = time.time()
         insert_times.append(tf - t0)
 
     avg_insert_time = mean(insert_times)
+    avg_times.append(avg_insert_time)
     m = "Client {i} took {dt} with op/s {o:2f}".format(
-        i=cid, dt=sum(insert_times), o=avg_insert_time/ndocs)
+        i=cid, dt=sum(insert_times), o=avg_insert_time)
     log.info(m)
 
 
-def main(nclients, ndocs, host, port):
-    log.info(
-        "Starting Main with {n} workers and inserting {m} docs each".format(
-            n=nclients, m=ndocs))
+def main(nclients, ndocs, connection_string):
 
-    pids = {}
-    for n in range(nclients):
-        pid = os.fork()
-        pids[n] = pid
+    with Manager() as manager:
+        avg_times = manager.list()
+        processes = []
 
-        if pid == 0:
-            log.debug("forking process {n}:{i}".format(n=n, i=pid))
-            mongo_inserter(n, ndocs, host, port)
-            os._exit(0)
+        t0 = time.time()
+        for n in range(nclients):
+            p = Process(target=mongo_inserter, args=(
+                n, ndocs, connection_string, avg_times))
+            p.start()
+            processes.append(p)
 
-    # wait for children to complete
-    os.waitpid(-1, 0)
-    print("completed!")
-    return 0
+        for p in processes:
+            p.join()
+
+        tf = time.time()
+        dt = tf - t0
+        print("completed!")
+        m = "Insertion took {dt} seconds with {o:2f} operations/s.".format(
+            dt=dt, o=(ndocs*nclients)/dt)
+        log.info(m)
+        m = "Each client took {o:2f} seconds on average to complete.".format(
+            o=mean(avg_times))
+        log.info(m)
+        return 0
 
 
 if __name__ == '__main__':
@@ -92,8 +108,7 @@ if __name__ == '__main__':
         sys.exit(
             main(
                 options.nclients, options.ndocs,
-                ["mongodb-router-0", "mongodb-router-1", "mongodb-router-2"],
-                16985))
+                os.environ["MONGODB_CONNECTION_URL"]))
     else:
         print("Provide --nclients")
         sys.exit(0)
