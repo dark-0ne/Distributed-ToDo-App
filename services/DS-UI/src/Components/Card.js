@@ -41,9 +41,9 @@ const Card = (props) => {
           <p className="card-text">{done ? <s>{props.date}</s> : props.date}</p>
         </div>
         <div className=" col-1 d-flex icons-container justify-content-end align-items-center">
-          <a href="#" className="p-2 editIcon">
+          {/* <a href="#" className="p-2 editIcon">
             <BsPencil className="icons" />
-          </a>
+          </a> */}
           <a
             href="#"
             className="deleteIcon"
