@@ -1,0 +1,30 @@
+# Set up mongos router instances
+- hosts: mongodb-router
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_repository
+    - mongodb-preinstall
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongos, config_servers: 'mongodb-cfgsrv-0:18585,mongodb-cfgsrv-1:18585,mongodb-cfgsrv-2:18585', mongos_port: 16985, bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false}
+
+  tasks:
+    - name: Upload custom mongosh scripts to add shards
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/mongodb"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+      run_once: true
+
+    - name: Run script to add shards
+      command: mongosh localhost:16985 -u dark0ne -p '{{ mongodb_admin_pwd }}' /home/dark0ne/mongodb/setup_mongos_shards.js
+      environment:
+        MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
+      run_once: true
+

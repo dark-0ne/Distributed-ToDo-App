@@ -2,3 +2,4 @@ Flask
 gunicorn[gevent]
 Werkzeug
 mongoengine
+requests

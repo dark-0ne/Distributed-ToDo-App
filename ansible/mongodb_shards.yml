@@ -1,0 +1,47 @@
+# Set up shard replicasets
+- hosts: mongodb-shard0, mongodb-shard1, mongodb-shard2
+  become: true
+  pre_tasks:
+    - name: Update apt cache if required
+      apt: update_cache=yes cache_valid_time=86400
+    - name: Install rsync on Debian_11
+      apt:
+        name: rsync
+  roles:
+    - community.mongodb.mongodb_linux
+    - community.mongodb.mongodb_repository
+    - mongodb-preinstall
+    - community.mongodb.mongodb_install
+    - { role: community.mongodb.mongodb_mongod, authorization: false, mongod_port: 16969, repl_set_name: "{{ group_names[0] }}", bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false, sharding: true}
+
+  tasks:
+    - name: Upload custom mongosh scripts to set up users and replica sets
+      ansible.posix.synchronize:
+        src: "{{playbook_dir}}/../services/mongodb"
+        dest: "/home/dark0ne"
+        use_ssh_args: true
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+    - name: Run script to set up replicaset
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_shard_replicaset.js
+      environment:
+        REPL_SET_NAME: "{{ group_names[0] }}"
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+    - name: Wait for replicaset to come online
+      ansible.builtin.wait_for:
+        timeout: 10
+      delegate_to: localhost
+      become: false
+
+    - name: Run script to set up users
+      command: mongosh localhost:16969 /home/dark0ne/mongodb/setup_shard_users.js
+      environment:
+        MONGODB_ADMIN_PWD: "{{ mongodb_admin_pwd }}"
+      when: inventory_hostname == "mongodb-shard0-0" or inventory_hostname == "mongodb-shard1-0" or inventory_hostname == "mongodb-shard2-0"
+
+- hosts: mongodb-shard0, mongodb-shard1, mongodb-shard2
+  become: true
+  roles:
+    - { role: community.mongodb.mongodb_mongod, mongod_port: 16969, repl_set_name: "{{ group_names[0] }}", bind_ip: "localhost, {{ private_ip }}, {{ inventory_hostname }}", skip_restart: false, sharding: true}
+

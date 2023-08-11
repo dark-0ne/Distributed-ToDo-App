@@ -69,6 +69,8 @@
         src: "{{playbook_dir}}/../services/nginx/certbot_conf.ini"
         dest: "/home/dark0ne/"
         use_ssh_args: true
+      tags:
+        - certbot
 
     - name: Wait 1 minute for DNS record to be updated
       ansible.builtin.wait_for:
@@ -80,9 +82,13 @@
 
     - name: Set up certbot
       shell: certbot certonly --nginx --config /home/dark0ne/certbot_conf.ini -d ds.csilabs.eu --non-interactive
+      tags:
+        - certbot
 
     - name: Initial update for permissions on certbot private keys
       shell: chmod a+r -R /etc/letsencrypt/archive/ds.csilabs.eu/
+      tags:
+        - certbot
 
     - name: Set up crontab job to update permissions on certbot private keys
       ansible.builtin.cron:
@@ -90,6 +96,8 @@
         minute: "32"
         hour: "3"
         job: "chmod a+r -R /etc/letsencrypt/archive/ds.csilabs.eu/"
+      tags:
+        - certbot
 
     - name: Disable default nginx config
       file: name=/etc/nginx/sites-enabled/default state=absent
