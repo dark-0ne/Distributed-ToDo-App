@@ -9,15 +9,16 @@ The application is built using a microservices architecture, with each service r
 The app will communicate with the MongoDB cluster via a RESTful API, which will provide methods for adding, updating, and retrieving to-do items. The app will also include a caching layer, using [Redis](https://redis.io/), to improve performance by reducing the number of requests to the MongoDB cluster.
 
 A general overview of the architecture is depicted below:
-![SoftwareArch](images/SoftwareArch.png)
+![SoftwareArch](images/SoftwareArch.jpg)
 
 Details of the architecture are as follows:
-**User Interface Layer:** The user interface layer is responsible for displaying the to-do list and allowing users to interact with the app. This layer is a web-based application and uses technologies such as HTML, CSS, JavaScript, React, and Redux.
-**API Layer:** The API servers provide the API layer of the to-do app, processing requests from the web server and returning responses. They could be deployed on multiple virtual machines or containers to provide horizontal scaling and high availability. This layer will be implemented using Flask.
-**Caching Layer:** The caching layer is responsible for improving performance by reducing the number of requests to the database layer. This layer uses a caching technology, which is Redis in our case, to store frequently-used data in memory, which can be retrieved quickly.
-**Database Layer:** The database layer is responsible for storing and retrieving the to-do items. The database layer uses a distributed key-value store, MongoDB, which is designed to handle a large amount of data and a high volume of requests.
-**Load Balancer:** The load balancer distributes incoming API requests to the API servers, using a load balancing algorithm to ensure that the load is evenly distributed across the API servers. Nginx will be used as the load balancer for this purpose.
-**Deployment Layer:** The deployment layer is responsible for deploying and managing the components of the app on a cloud platform (i.e, Google Cloud Platform). This layer also monitors the performance and availability of the app and ensures that it remains highly available and scalable.
+
+- **User Interface Layer:** The user interface layer is responsible for displaying the to-do list and allowing users to interact with the app. This layer is a web-based application and uses technologies such as HTML, CSS, JavaScript, React, and Redux.
+- **API Layer:** The API servers provide the API layer of the to-do app, processing requests from the web server and returning responses. They could be deployed on multiple virtual machines or containers to provide horizontal scaling and high availability. This layer will be implemented using Flask.
+- **Caching Layer:** The caching layer is responsible for improving performance by reducing the number of requests to the database layer. This layer uses a caching technology, which is Redis in our case, to store frequently-used data in memory, which can be retrieved quickly.
+- **Database Layer:** The database layer is responsible for storing and retrieving the to-do items. The database layer uses a distributed key-value store, MongoDB, which is designed to handle a large amount of data and a high volume of requests.
+- **Load Balancer:** The load balancer distributes incoming API requests to the API servers, using a load balancing algorithm to ensure that the load is evenly distributed across the API servers. Nginx will be used as the load balancer for this purpose.
+- **Deployment Layer:** The deployment layer is responsible for deploying and managing the components of the app on a cloud platform (i.e, Google Cloud Platform). This layer also monitors the performance and availability of the app and ensures that it remains highly available and scalable.
 
 ## Deployment
 
