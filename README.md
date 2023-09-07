@@ -20,6 +20,9 @@ Details of the architecture are as follows:
 - **Load Balancer:** The load balancer distributes incoming API requests to the API servers, using a load balancing algorithm to ensure that the load is evenly distributed across the API servers. Nginx will be used as the load balancer for this purpose.
 - **Deployment Layer:** The deployment layer is responsible for deploying and managing the components of the app on a cloud platform (i.e, Google Cloud Platform). This layer also monitors the performance and availability of the app and ensures that it remains highly available and scalable.
 
+Additionally, the mongodb cluster consists of 15 different nodes including data shards, config servers and mongos instances. For more information, refer to official [mongodb docs](https://www.mongodb.com/docs/manual/core/sharded-cluster-components/)
+![MongodbArch](images/mongodb-cluster-arch.png)
+
 ## Deployment
 
 ### Terraform
